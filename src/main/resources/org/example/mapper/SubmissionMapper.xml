@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.SubmissionMapper">
+
+    <insert id="insertSubmission" parameterType="Submission" useGeneratedKeys="true" keyProperty="submissionId">
+        INSERT INTO submissions (assignment_id, student_id, file_path, file_name, content_hash, similarity_pct, status, content_text)
+        VALUES (#{assignmentId}, #{studentId}, #{filePath}, #{fileName}, #{contentHash}, #{similarityPct}, #{status}, #{contentText})
+    </insert>
+
+    <select id="selectSubmissionByAssignmentAndStudent" resultType="Submission">
+        SELECT * FROM submissions 
+        WHERE assignment_id = #{assignmentId} AND student_id = #{studentId}
+    </select>
+
+    <select id="selectSubmissionsByAssignment" parameterType="int" resultType="Submission">
+        SELECT * FROM submissions WHERE assignment_id = #{assignmentId}
+        ORDER BY submitted_at DESC, submission_id DESC
+    </select>
+
+    <select id="countSubmissionsByAssignment" resultType="int">
+        SELECT COUNT(*) FROM submissions WHERE assignment_id = #{assignmentId}
+    </select>
+
+    <select id="selectSubmissionsByAssignmentPaged" resultType="Submission">
+        SELECT * FROM submissions
+        WHERE assignment_id = #{assignmentId}
+        ORDER BY submitted_at DESC, submission_id DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+    </select>
+
+    <select id="selectSubmissionById" resultType="Submission">
+        SELECT * FROM submissions WHERE submission_id = #{submissionId}
+    </select>
+
+    <update id="setFinalScore">
+        UPDATE submissions SET final_score = #{finalScore}, final_comment = #{finalComment}
+        WHERE submission_id = #{submissionId}
+    </update>
+
+</mapper>

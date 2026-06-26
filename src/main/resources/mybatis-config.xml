@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!-- 加载外部属性文件 -->
+    <properties resource="jdbc.properties"/>
+
+    <settings>
+        <!-- 开启驼峰命名自动映射 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!-- 开启日志 -->
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>
+
+    <typeAliases>
+        <typeAlias type="org.example.entity.Appeal" alias="Appeal"/>
+        <typeAlias type="org.example.entity.Assignment" alias="Assignment"/>
+        <typeAlias type="org.example.entity.Course" alias="Course"/>
+        <typeAlias type="org.example.entity.CourseMemberDTO" alias="CourseMemberDTO"/>
+        <typeAlias type="org.example.entity.PeerReviewAssignment" alias="PeerReviewAssignment"/>
+        <typeAlias type="org.example.entity.Review" alias="Review"/>
+        <typeAlias type="org.example.entity.ReviewDetailDTO" alias="ReviewDetailDTO"/>
+        <typeAlias type="org.example.entity.RubricItemDTO" alias="RubricItemDTO"/>
+        <typeAlias type="org.example.entity.Submission" alias="Submission"/>
+        <typeAlias type="org.example.entity.User" alias="User"/>
+    </typeAliases>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${jdbc.driver}"/>
+                <property name="url" value="${jdbc.url}"/>
+                <property name="username" value="${jdbc.username}"/>
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <mappers>
+        <mapper resource="org/example/mapper/AdminMapper.xml"/>
+        <mapper resource="org/example/mapper/AppealMapper.xml"/>
+        <mapper resource="org/example/mapper/AssignmentMapper.xml"/>
+        <mapper resource="org/example/mapper/CourseMapper.xml"/>
+        <mapper resource="org/example/mapper/DiscussionMapper.xml"/>
+        <mapper resource="org/example/mapper/EnrollmentMapper.xml"/>
+        <mapper resource="org/example/mapper/PeerReviewMapper.xml"/>
+        <mapper resource="org/example/mapper/ProfileMapper.xml"/>
+        <mapper resource="org/example/mapper/ReviewMapper.xml"/>
+        <mapper resource="org/example/mapper/RubricMapper.xml"/>
+        <mapper resource="org/example/mapper/StatisticsMapper.xml"/>
+        <mapper resource="org/example/mapper/SubmissionMapper.xml"/>
+        <mapper resource="org/example/mapper/UserMapper.xml"/>
+    </mappers>
+</configuration>

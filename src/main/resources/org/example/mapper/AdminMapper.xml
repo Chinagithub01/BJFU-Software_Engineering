@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.AdminMapper">
+
+    <select id="listUsers" resultType="java.util.HashMap">
+        SELECT u.user_id AS userId, u.username, u.real_name AS realName, u.email,
+               u.role_id AS roleId, r.role_name AS roleName, u.nickname, u.is_active AS isActive
+        FROM users u JOIN roles r ON u.role_id = r.role_id ORDER BY u.role_id, u.user_id
+    </select>
+
+    <select id="countUsers" resultType="int">
+        SELECT COUNT(*) FROM users
+    </select>
+
+    <select id="listUsersPaged" parameterType="map" resultType="java.util.HashMap">
+        SELECT u.user_id AS userId, u.username, u.real_name AS realName, u.email,
+               u.role_id AS roleId, r.role_name AS roleName, u.nickname, u.is_active AS isActive
+        FROM users u JOIN roles r ON u.role_id = r.role_id
+        ORDER BY u.role_id, u.user_id
+        OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+    </select>
+
+    <update id="updateUser" parameterType="java.util.HashMap">
+        UPDATE users SET role_id = #{roleId}, is_active = #{isActive} WHERE user_id = #{userId}
+    </update>
+
+    <select id="listCourses" resultType="java.util.HashMap">
+        SELECT c.course_id AS courseId, c.course_name AS courseName, c.course_code AS courseCode,
+               c.semester, u.real_name AS teacherName,
+               (SELECT COUNT(*) FROM course_enrollments ce WHERE ce.course_id = c.course_id) AS studentCount
+        FROM courses c JOIN users u ON c.teacher_id = u.user_id ORDER BY c.course_id DESC
+    </select>
+
+    <delete id="deleteCourseEnrollments"> DELETE FROM course_enrollments WHERE course_id = #{id} </delete>
+    <delete id="deleteAppealsByCourse">
+        DELETE FROM appeals WHERE submission_id IN (SELECT submission_id FROM submissions WHERE assignment_id IN (SELECT assignment_id FROM assignments WHERE course_id = #{id}))
+    </delete>
+    <delete id="deleteReviewScoresByCourse">
+        DELETE FROM review_scores WHERE review_id IN (SELECT r.review_id FROM reviews r JOIN peer_review_assignments pra ON r.pra_id = pra.pra_id WHERE pra.assignment_id IN (SELECT assignment_id FROM assignments WHERE course_id = #{id}))
+    </delete>
+    <delete id="deleteReviewsByCourse">
+        DELETE FROM reviews WHERE pra_id IN (SELECT pra_id FROM peer_review_assignments WHERE assignment_id IN (SELECT assignment_id FROM assignments WHERE course_id = #{id}))
+    </delete>
+    <delete id="deletePeerReviewsByCourse">
+        DELETE FROM peer_review_assignments WHERE assignment_id IN (SELECT assignment_id FROM assignments WHERE course_id = #{id})
+    </delete>
+    <delete id="deleteRubricItemsByCourse">
+        DELETE FROM rubric_items WHERE rubric_id IN (SELECT rubric_id FROM rubrics WHERE assignment_id IN (SELECT assignment_id FROM assignments WHERE course_id = #{id}))
+    </delete>
+    <delete id="deleteRubricsByCourse">
+        DELETE FROM rubrics WHERE assignment_id IN (SELECT assignment_id FROM assignments WHERE course_id = #{id})
+    </delete>
+    <delete id="deleteSubmissionsByCourse">
+        DELETE FROM submissions WHERE assignment_id IN (SELECT assignment_id FROM assignments WHERE course_id = #{id})
+    </delete>
+    <delete id="deleteAssignmentsByCourse">
+        DELETE FROM assignments WHERE course_id = #{id}
+    </delete>
+    <delete id="deleteCourse">
+        DELETE FROM courses WHERE course_id = #{id}
+    </delete>
+
+    <select id="platformStats" resultType="java.util.HashMap">
+        SELECT
+            (SELECT COUNT(*) FROM users) AS userCount,
+            (SELECT COUNT(*) FROM users WHERE role_id=4) AS studentCount,
+            (SELECT COUNT(*) FROM users WHERE role_id=2) AS teacherCount,
+            (SELECT COUNT(*) FROM courses) AS courseCount,
+            (SELECT COUNT(*) FROM assignments) AS assignmentCount,
+            (SELECT COUNT(*) FROM submissions) AS submissionCount,
+            (SELECT COUNT(*) FROM reviews WHERE status='submitted') AS reviewCount,
+            (SELECT COUNT(*) FROM appeals WHERE status='pending') AS pendingAppeals
+    </select>
+
+</mapper>

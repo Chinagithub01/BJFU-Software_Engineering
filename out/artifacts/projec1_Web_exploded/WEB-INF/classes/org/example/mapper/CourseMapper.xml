@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.CourseMapper">
+
+    <insert id="insertCourse" parameterType="Course" useGeneratedKeys="true" keyProperty="courseId">
+        INSERT INTO dbo.courses (course_name, course_code, description, teacher_id, semester, is_archived)
+        VALUES (#{courseName}, #{courseCode}, #{description}, #{teacherId}, #{semester}, #{isArchived})
+    </insert>
+
+    <select id="selectCourseById" parameterType="int" resultType="Course">
+        SELECT * FROM dbo.courses WHERE course_id = #{courseId}
+    </select>
+
+    <select id="selectCourseByCode" resultType="Course">
+        SELECT * FROM dbo.courses WHERE course_code = #{courseCode}
+    </select>
+
+    <select id="selectAllCourses" resultType="Course">
+        SELECT * FROM dbo.courses
+    </select>
+
+    <!-- 新增：如果是教师，查自己创建的课；如果是学生，查 enrolled 的课 -->
+    <select id="selectCoursesByUserId" resultType="Course">
+        <choose>
+            <when test="role == 'teacher'">
+                SELECT * FROM dbo.courses WHERE teacher_id = #{userId}
+            </when>
+            <otherwise>
+                SELECT c.* 
+                FROM dbo.courses c
+                INNER JOIN dbo.course_enrollments e ON c.course_id = e.course_id
+                WHERE e.user_id = #{userId}
+            </otherwise>
+        </choose>
+    </select>
+
+</mapper>

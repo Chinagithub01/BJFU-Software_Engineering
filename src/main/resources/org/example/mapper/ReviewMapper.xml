@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.ReviewMapper">
+
+    <insert id="insertReview" parameterType="org.example.entity.Review" useGeneratedKeys="true" keyProperty="reviewId">
+        INSERT INTO reviews (pra_id, overall_comment, total_score, status, submitted_at)
+        VALUES (#{praId}, #{overallComment}, #{totalScore}, #{status}, NOW())
+    </insert>
+
+    <select id="selectByPraId" resultType="org.example.entity.Review">
+        SELECT * FROM reviews WHERE pra_id = #{praId}
+    </select>
+
+    <insert id="insertReviewScore">
+        INSERT INTO review_scores (review_id, rubric_item_id, score, comment)
+        VALUES (#{reviewId}, #{rubricItemId}, #{score}, #{comment})
+    </insert>
+
+    <update id="updateReviewTotalScore">
+        UPDATE reviews SET total_score = #{totalScore} WHERE review_id = #{reviewId}
+    </update>
+
+    <update id="submitReview">
+        UPDATE reviews SET status = 'submitted', submitted_at = NOW() WHERE review_id = #{reviewId}
+    </update>
+
+    <select id="selectScoresByReviewId" resultType="java.util.HashMap">
+        SELECT rs.rubric_item_id AS rubricItemId, ri.item_name AS itemName,
+               rs.score, rs.comment, ri.max_score AS maxScore
+        FROM review_scores rs
+        JOIN rubric_items ri ON rs.rubric_item_id = ri.item_id
+        WHERE rs.review_id = #{reviewId}
+        ORDER BY ri.sort_order
+    </select>
+
+</mapper>

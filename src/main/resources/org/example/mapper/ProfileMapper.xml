@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.ProfileMapper">
+
+    <select id="studentSummary" resultType="java.util.HashMap">
+        SELECT
+            (SELECT COUNT(*) FROM course_enrollments WHERE user_id = #{userId}) AS courseCount,
+            (SELECT COUNT(*) FROM peer_review_assignments WHERE reviewer_id = #{userId} AND status = 'pending') AS pendingReviews,
+            (SELECT COUNT(*) FROM submissions WHERE student_id = #{userId}) AS submissionCount
+    </select>
+
+    <select id="teacherSummary" resultType="java.util.HashMap">
+        SELECT
+            (SELECT COUNT(*) FROM courses WHERE teacher_id = #{teacherId}) AS courseCount,
+            (SELECT COUNT(*) FROM assignments a
+                INNER JOIN courses c ON a.course_id = c.course_id
+                WHERE c.teacher_id = #{teacherId} AND a.status = 'published') AS publishedAssignments,
+            (SELECT COUNT(*) FROM appeals a
+                INNER JOIN peer_review_assignments pra ON a.pra_id = pra.pra_id
+                INNER JOIN assignments asgn ON pra.assignment_id = asgn.assignment_id
+                INNER JOIN courses c ON asgn.course_id = c.course_id
+                WHERE c.teacher_id = #{teacherId} AND a.status = 'pending') AS pendingAppeals
+    </select>
+
+</mapper>

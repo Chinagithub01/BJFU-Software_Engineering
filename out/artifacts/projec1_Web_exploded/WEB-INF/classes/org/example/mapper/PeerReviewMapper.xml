@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.PeerReviewMapper">
+
+    <insert id="insertPeerReview" parameterType="org.example.entity.PeerReviewAssignment" useGeneratedKeys="true" keyProperty="praId">
+        INSERT INTO dbo.peer_review_assignments (assignment_id, reviewer_id, submission_id, status)
+        VALUES (#{assignmentId}, #{reviewerId}, #{submissionId}, #{status})
+    </insert>
+
+    <select id="selectByReviewerId" resultType="org.example.entity.PeerReviewAssignment">
+        SELECT * FROM dbo.peer_review_assignments WHERE reviewer_id = #{reviewerId} ORDER BY status, assigned_at
+    </select>
+
+    <select id="selectById" resultType="org.example.entity.PeerReviewAssignment">
+        SELECT * FROM dbo.peer_review_assignments WHERE pra_id = #{praId}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE dbo.peer_review_assignments SET status = #{status} WHERE pra_id = #{praId}
+    </update>
+
+    <select id="countByAssignmentId" resultType="int">
+        SELECT COUNT(*) FROM dbo.peer_review_assignments WHERE assignment_id = #{assignmentId}
+    </select>
+
+    <select id="selectByAssignmentId" resultType="org.example.entity.PeerReviewAssignment">
+        SELECT * FROM dbo.peer_review_assignments WHERE assignment_id = #{assignmentId}
+    </select>
+
+    <select id="selectReviewsReceived" resultType="org.example.entity.PeerReviewAssignment">
+        SELECT pra.*
+        FROM dbo.peer_review_assignments pra
+        JOIN dbo.submissions s ON pra.submission_id = s.submission_id
+        WHERE s.student_id = #{studentId} AND pra.status = 'completed'
+        ORDER BY pra.assigned_at DESC
+    </select>
+
+</mapper>

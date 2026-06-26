@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.AssignmentMapper">
+
+    <insert id="insertAssignment" parameterType="Assignment" useGeneratedKeys="true" keyProperty="assignmentId">
+        INSERT INTO assignments (course_id, title, description, due_date, review_due_date, file_types, max_file_size_mb, peer_review_count, status, created_by)
+        VALUES (#{courseId}, #{title}, #{description}, #{dueDate}, #{reviewDueDate}, #{fileTypes}, #{maxFileSizeMb}, #{peerReviewCount}, #{status}, #{createdBy})
+    </insert>
+
+    <select id="selectAssignmentById" parameterType="int" resultType="Assignment">
+        SELECT * FROM assignments WHERE assignment_id = #{assignmentId}
+    </select>
+
+    <select id="selectAssignmentsByCourseId" parameterType="int" resultType="Assignment">
+        SELECT * FROM assignments WHERE course_id = #{courseId}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE assignments SET status = #{status} WHERE assignment_id = #{assignmentId}
+    </update>
+
+</mapper>

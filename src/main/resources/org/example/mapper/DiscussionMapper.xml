@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.DiscussionMapper">
+
+    <select id="selectByAssignment" resultType="java.util.HashMap">
+        SELECT d.discussion_id AS discussionId, d.content, d.created_at AS createdAt,
+               CONCAT(N'同学', CHAR(64 + DENSE_RANK() OVER (ORDER BY d.student_id))) AS anonymousName,
+               CASE WHEN #{studentId} IS NOT NULL AND d.student_id = #{studentId} THEN 1 ELSE 0 END AS isMine
+        FROM discussions d
+        WHERE d.assignment_id = #{assignmentId}
+        ORDER BY d.created_at
+    </select>
+
+    <insert id="insert">
+        INSERT INTO discussions (assignment_id, student_id, content) VALUES (#{assignmentId}, #{studentId}, #{content})
+    </insert>
+
+    <select id="checkSubmission" resultType="int">
+        SELECT COUNT(*) FROM submissions WHERE assignment_id = #{assignmentId} AND student_id = #{studentId}
+    </select>
+
+</mapper>
